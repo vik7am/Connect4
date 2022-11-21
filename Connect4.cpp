@@ -30,27 +30,23 @@ class Connect4Board{
         int i = row;
         int j = column;
         switch(direction){
-            case 0: i-=3; j+=3;break;
-            case 1: j+=3;break;
-            case 2: i+=3; j+=3;break;
-            case 3: i+=3;break;
-            case 4: i+=3; j-=3;break;
-            case 5: j-=3;break;
-            case 6: i-=3; j-=3;break;
+            case 0: i=-1; j=1; break;
+            case 1: i=0; j=1; break;
+            case 2: i=1; j=1; break;
+            case 3: i=1; j=0; break;
+            case 4: i=1; j=-1; break;
+            case 5: i=0; j=-1; break;
+            case 6: i=-1; j=-1; break;
         }
-        if(i<0 || i>=ROW_SIZE || j<0 || j>=COLUMN_SIZE)
+        if(row+3*i<0 || row+3*i>=ROW_SIZE || column+3*j<0 || column+3*j>=COLUMN_SIZE)
             return false;
-        if(board[row][column] != board[i][j])
+        if(board[row][column] != board[row+3*i][column+3*j])
             return false;
-        switch(direction){
-            case 0: if(board[row][column] != board[row-1][column+1] || board[row][column] != board[row-2][column+2]) return false;break;
-            case 1: if(board[row][column] != board[row][column+1] || board[row][column] != board[row][column+2]) return false;break;
-            case 2: if(board[row][column] != board[row+1][column+1] || board[row][column] != board[row+2][column+2]) return false;break;
-            case 3: if(board[row][column] != board[row+1][column] || board[row][column] != board[row+2][column]) return false;break;
-            case 4: if(board[row][column] != board[row+1][column-1] || board[row][column] != board[row+2][column-2]) return false;break;
-            case 5: if(board[row][column] != board[row][column-1] || board[row][column] != board[row][column-2]) return false;break;
-            case 6: if(board[row][column] != board[row-1][column-1] || board[row][column] != board[row-2][column-2]) return false;break;
-        }
+        if(board[row][column] != board[row+i][column+j])
+            return false;
+        if(board[row][column] != board[row+2*i][column+2*j])
+            return false;
+        return true;
         return true;
     }
     void displayBoard(){
@@ -101,10 +97,10 @@ class GameManager{
                 cout << "No space to drop ball" << endl;
                 continue;
             }
+            game.displayBoard();
             if(game.gameOver){
                 break;
             }
-            game.displayBoard();
             player1Turn = !player1Turn;
             turn++;
         }
