@@ -1,7 +1,8 @@
-#include<bits/stdc++.h>
+#include<iostream>
 using namespace std;
 
 enum Player{PLAYER1 = 82, PLAYER2 = 66};
+enum Direction{NORTH_EAST, EAST, SOUTH_EAST, SOUTH, SOUTH_WEST, WEST, NORTH_WEST};
 
 class Connect4Board{
     const int ROW_SIZE = 6;
@@ -36,16 +37,18 @@ class Connect4Board{
         int i = rowIndex;
         int j = columnIndex;
         switch(direction){
-            case 0: i=-1; j=1; break;
-            case 1: i=0; j=1; break;
-            case 2: i=1; j=1; break;
-            case 3: i=1; j=0; break;
-            case 4: i=1; j=-1; break;
-            case 5: i=0; j=-1; break;
-            case 6: i=-1; j=-1; break;
+            case NORTH_EAST: i=-1; j=1; break;
+            case EAST:       i=0; j=1; break;
+            case SOUTH_EAST: i=1; j=1; break;
+            case SOUTH:      i=1; j=0; break;
+            case SOUTH_WEST: i=1; j=-1; break;
+            case WEST:       i=0; j=-1; break;
+            case NORTH_WEST: i=-1; j=-1; break;
         }
+        // Returns false if 4th location in the given direction is out of bounds
         if(rowIndex+3*i<0 || rowIndex+3*i>=ROW_SIZE || columnIndex+3*j<0 || columnIndex+3*j>=COLUMN_SIZE)
             return false;
+        // compares vales of 1st and 4th location in the board 
         if(board[rowIndex][columnIndex] != board[rowIndex+3*i][columnIndex+3*j])
             return false;
         if(board[rowIndex][columnIndex] != board[rowIndex+i][columnIndex+j])
@@ -55,6 +58,7 @@ class Connect4Board{
         return true;
     }
     void displayBoard(){
+        cout << endl;
         cout << "  1   2   3   4   5   6   7  " << endl;
         cout << "|---|---|---|---|---|---|---|" << endl;
         for(int i=0; i<6; i++){
@@ -64,6 +68,7 @@ class Connect4Board{
             }
             cout << "\n|---|---|---|---|---|---|---|" << endl;
         }
+        cout << endl;
     }
 };
 class GameManager{
@@ -81,10 +86,10 @@ class GameManager{
         game.displayBoard();
         while(turn < 42){
             playerNo = (activePlayer == PLAYER1)? 1: 2;
-            cout << "Player" << playerNo << "(" << char(activePlayer) << ") Turn: ";
+            cout << "Player " << playerNo << " (" << char(activePlayer) << ") Turn: ";
             cin >> input;
             if(input <= 0 || input > 7){
-                cout << "Invalid Input" << endl;
+                cout << "Invalid Column number" << endl;
                 continue;
             }
             if(game.dropBall(activePlayer, input) == false){
@@ -114,14 +119,28 @@ class GameManager{
     }
 };
 
+void welcomeMessage(){
+    cout << "\nWELCOME TO CONNECT4\n";
+    cout << "\nRULES :-\n";
+    cout << "1. Two-player (red & blue) game.\n";
+    cout << "2. Board size is  6 rows x 7 columns.\n";
+    cout << "3. A player wins if he/she is able to connect 4 dots horizontally, vertically or diagonally.\n";
+    cout << "4. Draw when the matrix is fully filled.\n";
+    cout << "\nHow to play :-\n";
+    cout << "1. Game always starts with the player - 1 i.e. Red(R).\n";
+    cout << "2. In each step, each player can choose the column number in which they want to drop the ball.\n";
+    cout << "3. Rows will be filled from bottom to top in any column.\n" << endl;
+
+}
+
 int main()
 {
     GameManager gameManager;
     int playerChoice;
      bool exitGame;
     while(exitGame == false){
-        cout << "WELCOME TO CONNECT4" << endl;
-        cout << "1. Start \n2. Exit \nYour Choice ";
+        welcomeMessage();
+        cout << "MAIN MENU \n1. Start \n2. Exit \nYour Choice: ";
         cin >> playerChoice;
         if(playerChoice == 1){
             gameManager.playGame();
