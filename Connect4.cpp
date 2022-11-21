@@ -2,15 +2,15 @@
 using namespace std;
 
 enum Player{PLAYER1 = 82, PLAYER2 = 66};
-enum Direction{NORTH_EAST, EAST, SOUTH_EAST, SOUTH, SOUTH_WEST, WEST, NORTH_WEST};
+enum Direction{NORTH_EAST, EAST, SOUTH_EAST, SOUTH, SOUTH_WEST, WEST, NORTH_WEST, NORTH};
 
 class Connect4Board{
     const int ROW_SIZE = 6;
     const int COLUMN_SIZE = 7;
     char board[6][7];
     int availableSpace[7];
-    int rowIndex;
-    int columnIndex;
+    int mainRowIndex;
+    int mainColumnIndex;
     public:
     void resetBoard(){
         for(int i=0; i<ROW_SIZE; i++)
@@ -20,22 +20,48 @@ class Connect4Board{
             availableSpace[i] = ROW_SIZE;
     }
     bool isBoardColumnFull(){
-        if(availableSpace[columnIndex] > 0)
+        if(availableSpace[mainColumnIndex] > 0)
             return false;
         return true;
     }
     bool dropBall(char playerName, int column){
-        columnIndex = column -1;
+        mainColumnIndex = column -1;
         if(isBoardColumnFull())
             return false;
-        rowIndex = availableSpace[columnIndex] - 1;
-        board[rowIndex][columnIndex] = playerName;
-        availableSpace[columnIndex]--;
+        mainRowIndex = availableSpace[mainColumnIndex] - 1;
+        board[mainRowIndex][mainColumnIndex] = playerName;
+        availableSpace[mainColumnIndex]--;
         return true;
     }
-    bool checkBall(char player, int direction){
-        int i = rowIndex;
-        int j = columnIndex;
+    bool checkConnect4(char playerName){
+        int i,j;
+        // check in all directions for a pair of 4
+        for(int k=0; k<7; k++)
+            if(checkBall(mainRowIndex, mainColumnIndex, k))
+                return true;
+        // check all adjecent positions for a pair of 4
+        for(int direction=0; direction<7; direction++){
+            switch(direction){
+            case NORTH_EAST: i=-1; j=1; break;
+            case EAST:       i=0; j=1; break;
+            case SOUTH_EAST: i=1; j=1; break;
+            case SOUTH_WEST: i=1; j=-1; break;
+            case WEST:       i=0; j=-1; break;
+            case NORTH_WEST: i=-1; j=-1; break;
+            default : continue;
+            }
+            // if adjecent position is not equal to maim position then contine the loop for next
+            if(board[mainRowIndex][mainColumnIndex] != board[mainRowIndex+i][mainColumnIndex+j])
+                continue;
+            // check in all directions for a pair of 4
+            for(int k=0; k<7; k++)
+                if(checkBall(mainRowIndex+i, mainColumnIndex+j, k))
+                    return true;
+        }
+        return false;
+    }
+    bool checkBall(int rowIndex, int columnIndex, int direction){
+        int i,j;
         switch(direction){
             case NORTH_EAST: i=-1; j=1; break;
             case EAST:       i=0; j=1; break;
@@ -82,6 +108,7 @@ class GameManager{
     void playGame(){
         activePlayer = PLAYER1;
         turn = 0;
+        gameOver = false;
         game.resetBoard();
         game.displayBoard();
         while(turn < 42){
@@ -97,7 +124,7 @@ class GameManager{
                 continue;
             }
             for(int i=0; i<7; i++)
-                if(game.checkBall(activePlayer, i))
+                if(game.checkConnect4(activePlayer))
                     gameOver = true;
             game.displayBoard();
             if(gameOver)
