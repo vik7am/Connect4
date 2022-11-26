@@ -33,6 +33,42 @@ class Connect4Board{
         availableSpace[mainColumnIndex]--;
         return true;
     }
+
+    bool playerWon(char playerName){
+        int i,j;
+        int counter;
+        if(chackDirection(0, 1))
+            return true;
+        if(chackDirection(1, 1))
+            return true;
+        if(chackDirection(1, 0))
+            return true;
+        if(chackDirection(0, -1))
+            return true;
+        return false;
+        
+    }
+
+    bool chackDirection(int i, int j){
+        int counter = 0;
+        for(int k=1; k<=3; k++){
+            if(validPos(mainRowIndex+i*k, mainColumnIndex+j*k) == false)
+                break;
+            if(board[mainRowIndex+i*k][mainColumnIndex+j*k] != board[mainRowIndex][mainColumnIndex])
+                break;
+            counter++;
+        }
+        for(int k=1; k<=3; k++){
+            if(validPos(mainRowIndex+i*k, mainColumnIndex+j*k) == false)
+                break;
+            if(board[mainRowIndex-i*k][mainColumnIndex-j*k] != board[mainRowIndex][mainColumnIndex])
+                break;
+            counter++;
+        }
+        if(counter >= 3)
+            return true;
+        return false;
+    }
     bool checkConnect4(char playerName){
         int i,j;
         // check in all directions for a pair of 4
@@ -40,7 +76,13 @@ class Connect4Board{
             if(checkBall(mainRowIndex, mainColumnIndex, k))
                 return true;
         // check all adjecent positions for a pair of 4
+
+        int XAxis[8] = {1,1,0,1,-1,-1,0,-1};
+        int YAxis[8] = {0,1,1,-1,0,-1,-1,1};
+
         for(int direction=0; direction<7; direction++){
+
+
             switch(direction){
             case NORTH_EAST: i=-1; j=1; break;
             case EAST:       i=0; j=1; break;
@@ -60,6 +102,13 @@ class Connect4Board{
         }
         return false;
     }
+
+    bool validPos(int row,int col, int boundaryX = 6, int boundaryY = 7)
+    {
+        if(row<0 && row>=boundaryX && col<0 && col>=boundaryY)return false;
+        return true;
+    }
+
     bool checkBall(int rowIndex, int columnIndex, int direction){
         int i,j;
         switch(direction){
@@ -112,6 +161,8 @@ class GameManager{
         game.resetBoard();
         game.displayBoard();
         while(turn < 42){
+            if(turn == 6)
+                turn = turn;
             playerNo = (activePlayer == PLAYER1)? 1: 2;
             cout << "Player " << playerNo << " (" << char(activePlayer) << ") Turn: ";
             cin >> input;
@@ -123,9 +174,11 @@ class GameManager{
                 cout << "No space to drop ball" << endl;
                 continue;
             }
-            for(int i=0; i<7; i++)
-                if(game.checkConnect4(activePlayer))
-                    gameOver = true;
+            if(game.playerWon(activePlayer))
+                gameOver = true;
+            //for(int i=0; i<7; i++)
+            //if(game.checkConnect4(activePlayer))
+            //    gameOver = true;
             game.displayBoard();
             if(gameOver)
                 break;
@@ -164,7 +217,7 @@ int main()
 {
     GameManager gameManager;
     int playerChoice;
-     bool exitGame;
+    bool exitGame;
     while(exitGame == false){
         welcomeMessage();
         cout << "MAIN MENU \n1. Start \n2. Exit \nYour Choice: ";
